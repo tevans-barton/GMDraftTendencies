@@ -1,0 +1,9 @@
+{
+    "years" : [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019],
+    "teams" : [
+        "gnb", "sdg", "rai", "den", "kan", "cin", "cle", "pit", "rav", "jax", "clt", "oti", "htx",
+        "mia", "nyj", "buf", "phi", "dal", "nyg", "was", "nor", "atl", "tam", "car", "det", "chi",
+        "min", "nwe"
+    ],
+    "outpath" : "/data/raw"
+}

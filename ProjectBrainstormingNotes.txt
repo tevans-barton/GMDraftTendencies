@@ -1,0 +1,18 @@
+NFL GM DRAFT TENDENCIES PROJECT NOTES
+
+I. Tendencies Definition
+	A. What is a GM likely to do/not do in terms of
+		1. Positions
+		2. Rounds
+		3. Player Profiles
+		4. Trades
+			a. When do they trade up vs. down
+		5. What do their predecessors have to do with these decisions
+II. Tendencies to look at
+	A. What are they most likely to do in certain rounds?
+	B. What are they most likely to do regarding certain positions
+	C. How do they behave regarding trades?
+III. Baseline to compare to
+	A. Average GM's distribution/tendencies?
+	B. GM's besides them?
+	C. How an average draft plays out?
