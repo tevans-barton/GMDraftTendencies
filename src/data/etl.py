@@ -7,6 +7,7 @@ import os
 import requests
 import urllib
 import json
+import numpy as np
 
 TOP_PATH = os.environ['PWD']
 
@@ -26,6 +27,15 @@ def get_draft_table(year):
         else:    
             col_names.append(str(col[0]) + ' ' + str(col[1]))
     df.columns = col_names
+    #Since data on website is broken up by round, 'Pick' appears as a value in the column
+    #Except for years where draft has not occurred yet
+    try:
+        df = df[df['Pick'] != 'Pick']
+    except KeyError:
+        print('No picks for ' + str(year))
+        pass
+    #Want a column in the table with the year for easier merging later
+    df['YEAR'] = [year] * len(df)
     return df
 
 
@@ -36,7 +46,7 @@ def get_executives_table(team):
     #Gets the DataFrame from this website, 0 because there are multiple dataframes on this page
     df = pd.read_html(url)[0]
     #Drop some unnecessary columns
-    df = df.drop(['Teams', 'Notes'], axis = 1)
+    df = df.drop(['Notes'], axis = 1)
     return df
 
 
@@ -49,6 +59,7 @@ def get_combine_table(year):
     df = df.drop(['Unnamed: 13', 'Unnamed: 14'], axis = 1)
     return df
 
+
 def get_data(years, teams, outpath):
     #Check if the outpath exists, if not, make it
     if not os.path.exists(TOP_PATH + outpath):
@@ -56,20 +67,23 @@ def get_data(years, teams, outpath):
     #Get draft data for each year
     for y in years:
         try:
-            get_draft_table(y).to_csv(TOP_PATH + outpath + '/DRAFT_' + str(y) + '.csv')
+            get_draft_table(y).to_csv(TOP_PATH + outpath + '/DRAFT_' + str(y) + '.csv', index = False)
         except urllib.error.HTTPError:
             print('No draft data for ' + str(y))
             pass
         try:
-            get_combine_table(y).to_csv(TOP_PATH + outpath + '/COMBINE_' + str(y) + '.csv')
+            get_combine_table(y).to_csv(TOP_PATH + outpath + '/COMBINE_' + str(y) + '.csv', index = False)
         except urllib.error.HTTPError:
             print('No combine data for ' + str(y))
             pass
-    #Get executive data for each team
+    #Get executive data for each team and put it into one table
+    executives_table = pd.DataFrame()
     for t in teams:
         try:
-            get_executives_table(t).to_csv(TOP_PATH + outpath + '/EXECUTIVES_' + str(t).upper() + '.csv')
+            executives_table = executives_table.append(get_executives_table(t))
         except urllib.HTTPError:
             print('No executive data available for ' + str(t))
             pass
+    executives_table = executives_table.reset_index(drop = True)
+    executives_table.to_csv(TOP_PATH + outpath + '/EXECUTIVES.csv', index = False)
     return
