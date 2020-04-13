@@ -51,12 +51,14 @@ def get_executives_table(team):
 
 
 def get_combine_table(year):
-    #Want URL to have form https://nflcombineresults.com/nflcombinedata.php?year=2010&pos=&college=
-    COMBINE_URL_PREFIX = 'https://nflcombineresults.com/nflcombinedata.php?year='
-    url = COMBINE_URL_PREFIX + str(year) + '&pos=&college='
+    #Want URL to have form https://www.pro-football-reference.com/draft/2020-combine.htm
+    COMBINE_URL_PREFIX = 'https://www.pro-football-reference.com/draft/'
+    url = COMBINE_URL_PREFIX + str(year) + '-combine.htm'
     #Gets the DataFrame from this website, 0 because there are multiple dataframes on this page
     df = pd.read_html(url)[0]
-    df = df.drop(['Unnamed: 13', 'Unnamed: 14'], axis = 1)
+    df.drop(['College', 'Drafted (tm/rnd/yr)'], axis = 1, inplace = True)
+    #Get rid of extra header rows
+    df = df[df['Player'] != 'Player']
     return df
 
 

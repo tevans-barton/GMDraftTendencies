@@ -12,64 +12,32 @@ MOST_RECENT_DRAFT = 2019
 
 def clean_combine(df_passed):
     df = df_passed.copy()
-    df.dropna(how = 'all', inplace = True)
-    #Several columns have a 'missing value' entry of 9.99, so replace those with NaN
-    df['40 Yard'] = df['40 Yard'].replace(9.99, value = np.nan)
-    df['Shuttle'] = df['Shuttle'].replace(9.99, value = np.nan)
-    df['3Cone'] = df['3Cone'].replace(9.99, value = np.nan)
-    college_map = {
-        'Frenso State' : 'Fresno State',
-        'Southeast Louisiana' : 'Southeastern Louisiana',
-        'Nevada Las Vegas' : 'UNLV',
-        'Southern California' : 'USC'
-    }
-    df['College'] = df['College'].apply(lambda x : re.sub(r' \(.*\)', '', x) if isinstance(x, str) else x)
-    df['College'] = df['College'].apply(lambda x : college_map[x] if x in college_map.keys() else x)
+    #Info for David Long the Linebacker is incorrect in the dataset and needs to be manually fixed :(
+    if 'David Long' in df['Player'].values:
+        the_loc = df[(df['Player'] == 'David Long') & (df['Pos'] == 'LB')]['School'].index[0]
+        df.loc[the_loc] = ['David Long', 'LB', 'West Virginia', '5-11', 227, np.nan, np.nan, 18, np.nan, np.nan, np.nan]
+    #Convert height from strings of form ft-in into integers in inches
+    df['Ht'] = df['Ht'].apply(lambda x : int(x.split('-')[0]) * 12 + int(x.split('-')[1]))
+    df['School'] = df['School'].apply(lambda x: x.replace('St.', 'State'))
     return df
 
-
 def clean_draft(df_passed):
-
-    def clean_college_column(col):
-        college_map = {
-            'Ala-Birmingham' : 'Alabama-Birmingham',
-            'Ark-Pine Bluff' : 'Arkansas-Pine Bluff',
-            'BYU' : 'Brigham Young',
-            'Boston Col.' : 'Boston College',
-            'Concordia-StatePaul' : 'Concordia - St Paul',
-            'Hobart' : 'Hobart & William Smith',
-            'Kutztown Pennsylvania' : 'Kutztown',
-            'LSU' : 'Louisiana State',
-            'La-Monroe' : 'Louisiana-Monroe',
-            'Middle Tenn. State' : 'Middle Tennessee State',
-            'Missouri Western State' : 'Missouri Western',
-            'NW Missouri State' : 'Northwest Missouri State',
-            'NW State' : 'Northwestern State',
-            'Prairie View' : 'Prairie View A&M',
-            'S.F. Austin' : 'Stephen F. Austin',
-            'SE Louisiana' : 'Southeastern Louisiana',
-            'SE Missouri State' : 'Southeast Missouri State',
-            'SMU' : 'Southern Methodist',
-            'Southern Miss' : 'Southern Mississippi',
-            'TCU' : 'Texas Christian',
-            'Tenn-Chattanooga' : 'Tennessee-Chattanooga',
-            'Tenn-Martin' : 'Tennessee-Martin',
-            'The Citadel' : 'Citadel',
-            'West. Carolina' : 'Western Carolina',
-            'West. Illinois' : 'Western Illinois',
-            'West. Michigan' : 'Western Michigan',
-            'Louisiana' : 'Louisiana-Lafayette',
-            'Charlotte' : 'North Carolina Charlotte'
-        }
-        col = col.apply(lambda x : x.replace('St.', 'State') if isinstance(x, str) else x)
-        col = col.apply(lambda x : re.sub(r' \(.*\)', '', x) if isinstance(x, str) else x)
-        col = col.apply(lambda x : x.replace('East.', 'Eastern') if isinstance(x, str) else x)
-        col = col.apply(lambda x : college_map[x] if x in college_map.keys() else x)
-        return col
-
     df = df_passed.copy()
+    college_map = {
+        'Hobart' : 'Hobart & William Smith',
+        'The Citadel' : 'Citadel',
+        'Concordia-StatePaul (MN)' : 'Concordia (MN)',
+        'Charleston (WV)' : 'Charleston',
+        'S.F. Austin' : 'Stephen F. Austin',
+        'West. Illinois' : 'Western Illinois',
+        'NW Missouri State' : 'Northwest Missouri State',
+        'Middle Tenn. State' : 'Middle Tennessee State',
+        'Tenn-Martin' : 'Tennessee-Martin'
+    }
+    #Changing College data to match up with how combine has college inputted
     try:
-        df['College/Univ'] = clean_college_column(df['College/Univ'])
+        df['College/Univ'] = df['College/Univ'].apply(lambda x: x.replace('St.', 'State') if isinstance(x, str) else x)
+        df['College/Univ'] = df['College/Univ'].apply(lambda x: college_map[x] if x in college_map.keys() else x)
     except KeyError:
         print('Error cleaning college info for ' + str(int(df['YEAR'][0])) + ' possibly due to draft not having happened yet')
         pass
@@ -78,11 +46,11 @@ def clean_draft(df_passed):
 
 def merge_draft_and_combine(draft_df, combine_df):
     #Merge two dataframes, include position to get past duplicate name issue
-    full_df = draft_df.merge(combine_df, how = 'left', left_on = 'Player', right_on = 'Name')
+    full_df = draft_df.merge(combine_df, how = 'left', left_on = ['Player', 'College/Univ'], right_on = ['Player', 'School'])
     #Drop Redundant Columns
-    #full_df = full_df.drop(['College', 'Name', 'POS', 'Year', 'Unnamed: 0_y', 'Unnamed: 0_x'], axis = 1, errors = 'ignore')
+    full_df.drop(['Pos_y', 'School'], axis = 1, inplace = True)
     #Make sure no data was lost
-    #assert(len(full_df) == len(draft_df)), 'Lost data for ' + str(int(full_df['YEAR'][0]))
+    assert(len(full_df) == len(draft_df)), 'Lost data for ' + str(int(full_df['YEAR'][0]))
     return full_df
 
 
@@ -127,7 +95,7 @@ def clean_merged_dataframe(df_passed):
     #Want to make team names the same format as the executives table for later
     df['Tm'] = df['Tm'].map(team_dict)
     #Make names for columns more precise
-    df.rename({'Receiving Rec' : 'Rec'}, axis = 1, inplace = True)
+    df.rename({'Receiving Rec' : 'Rec', 'Pos_x' : 'Pos'}, axis = 1, inplace = True)
     return df
 
 
