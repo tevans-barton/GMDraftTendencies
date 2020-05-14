@@ -100,6 +100,7 @@ def clean_merged_dataframe(df_passed):
 
 
 def combine_and_clean_all_drafts():
+    #Note: There should be 2544 rows in total (for years 2010 - 2019)
     #Get all of the paths to the draft CSVs
     draft_paths = np.sort(glob(TOP_PATH + '/data/raw/DRAFT_*.csv'))
     #Get all of the paths to the combine CSVs
@@ -159,6 +160,7 @@ def combine_drafts_and_executives(full_draft_df, curr_execs_df):
     df = df[[df.loc[x]['YEAR'] in df.loc[x]['Years Worked'] for x in range(len(df))]]
     #Drop unnecessary columns
     df.drop(['Years Worked', 'From', 'To_y', 'Teams', 'Titles'], axis = 1, inplace = True, errors = 'ignore')
+    df.rename({'Person' : 'GM'}, axis = 1, inplace = True)
     df.rename({'To_x' : 'Played To'}, axis = 1, inplace = True)
     if not os.path.exists(TOP_PATH + '/data/final'):
         os.mkdir(TOP_PATH + '/data/final')

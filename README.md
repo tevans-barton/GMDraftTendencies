@@ -1,2 +1,8 @@
 # GMDraftTendencies
 Analyzing NFL General Managers' Draft Tendencies
+
+
+## Abstract
+Every year in April the NFL Draft takes over the sports world, as General Managers from all 32 franchises go into battle to improve their teams. Arguably the most important three days on the NFL calendar outside of the Super Bowl, future titles are won and lost over these 7 rounds, as GMs handle risky deals and difficult evaluations. Inevitably, some will succeed, while others fail; players bust, picks are made for need rather than value, and the apple of your eye too often gets snatched up by your rival just a handful of picks before your own. It's in this last scenario that a GM most often panics; the player that they were planning to take disappears from their grasp, and they're left without a plan. It's in this scenario that a GM wishes they could have predicted such a surprise.
+
+It's with this in mind that this project was created. Every GM has some underlying strategy to their drafting, some reasoning to their selections, that has been molded by years in the business. Some prefer to pick skill position players early, others build through the trenches. Some managers have strict athletic profiles that they follow, others are far less concerned with testing numbers. Using data from previous drafts and scouting combines, this project seeks to analyze current NFL General Managers' past tendencies and patterns, in an effort to predict their future moves, and ultimately, help a GM maximize their own picks' values.

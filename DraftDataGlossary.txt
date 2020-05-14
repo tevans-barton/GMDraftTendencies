@@ -1,0 +1,46 @@
+Rnd -- Round selected in draft
+Supplemental draft round indicated with 'S'
+Pick -- Overall Selection in Draft
+Pos -- Position
+In player and team season stats,
+Capitals indicates primary starter.
+Lower-case means part-time starter.
+Age -- Age as of September 1 of the draft year
+To -- Last Year
+Misc
+AP1 -- First-team all-pro selections
+PB -- Pro Bowl Selections
+St -- Number of years as primary starter for his team at his position
+Approx Val
+CarAV -- Weighted Career Approximate Value.
+See the glossary for details on how we compute Approximate Value.
+The career AV is computed by summing
+100 percent of the AV of his best season,
+95 percent of the AV of his next-best season,
+90 percent of the AV of his third-best season,
+and so on
+DrAV -- AV accumulated for team that drafted this player
+Games
+G -- Games played
+Passing
+Cmp -- Passes completed
+Att -- Passes attempted
+Yds -- Yards Gained by Passing
+For teams, sack yardage is deducted from this total
+TD -- Passing Touchdowns
+Int -- Interceptions thrown
+Rushing
+Att -- Rushing Attempts (sacks not included in NFL)
+Yds -- Rushing Yards Gained (sack yardage is not included by NFL)
+TD -- Rushing Touchdowns
+Receiving
+Rec -- Receptions
+Yds -- Receiving Yards
+TD -- Receiving Touchdowns
+Tackles
+Solo -- Tackles
+Before 1994: unofficial and inconsistently recorded from team to team. For amusement only.
+1994-now: unofficial but consistently recorded.
+Def Interceptions
+Int -- Passes intercepted on defense
+Sk -- Sacks (since 1982)
