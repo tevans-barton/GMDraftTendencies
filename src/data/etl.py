@@ -11,6 +11,8 @@ import numpy as np
 
 TOP_PATH = os.environ['PWD']
 
+
+
 def get_draft_table(year):
     #Want URL to have form 'https://www.pro-football-reference.com/years/2019/draft.htm'
     DRAFT_URL_PREFIX = 'https://www.pro-football-reference.com/years/'
@@ -36,6 +38,7 @@ def get_draft_table(year):
         pass
     #Want a column in the table with the year for easier merging later
     df['YEAR'] = [year] * len(df)
+    df = df.drop(['Approx Val CarAV', 'Approx Val DrAV'], axis = 1, errors = 'ignore')
     return df
 
 

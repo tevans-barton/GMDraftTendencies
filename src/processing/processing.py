@@ -8,7 +8,7 @@ import numpy as np
 from glob import glob
 
 TOP_PATH = os.environ['PWD']
-MOST_RECENT_DRAFT = 2019
+MOST_RECENT_DRAFT = 2020
 
 def clean_combine(df_passed):
     df = df_passed.copy()
@@ -18,6 +18,7 @@ def clean_combine(df_passed):
         df.loc[the_loc] = ['David Long', 'LB', 'West Virginia', '5-11', 227, np.nan, np.nan, 18, np.nan, np.nan, np.nan]
     #Convert height from strings of form ft-in into integers in inches
     df['Ht'] = df['Ht'].apply(lambda x : int(x.split('-')[0]) * 12 + int(x.split('-')[1]))
+    #Replace the state abbreviation with the full word for continuity with draft data
     df['School'] = df['School'].apply(lambda x: x.replace('St.', 'State'))
     return df
 
@@ -39,8 +40,11 @@ def clean_draft(df_passed):
         df['College/Univ'] = df['College/Univ'].apply(lambda x: x.replace('St.', 'State') if isinstance(x, str) else x)
         df['College/Univ'] = df['College/Univ'].apply(lambda x: college_map[x] if x in college_map.keys() else x)
     except KeyError:
-        print('Error cleaning college info for ' + str(int(df['YEAR'][0])) + ' possibly due to draft not having happened yet')
+        print('Error cleaning college info for ' + str(int(df['YEAR'][0])) + ' draft, possibly due to draft not having happened yet')
         pass
+    df = df.fillna({'Solo' : 0, 'Int' : 0, 'Sk' : 0, 'Passing Cmp' : 0, 'Passing Att' : 0, 'Passing Yds' : 0,
+                    'Passing Int' : 0, 'Rushing Att' : 0, 'Rushing Yds' : 0, 'Rushing TD' : 0, 'Receiving Rec' : 0, 
+                    'Receiving Yds' : 0, 'Receiving TD' : 0})
     return df
 
 
