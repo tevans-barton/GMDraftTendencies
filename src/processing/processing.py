@@ -39,12 +39,13 @@ def clean_draft(df_passed):
     try:
         df['College/Univ'] = df['College/Univ'].apply(lambda x: x.replace('St.', 'State') if isinstance(x, str) else x)
         df['College/Univ'] = df['College/Univ'].apply(lambda x: college_map[x] if x in college_map.keys() else x)
+        df['Pos'] = df['Pos'].replace({'DL' : 'DE', 'T' : 'OT'})
+        df = df.fillna({'Solo' : 0, 'Int' : 0, 'Sk' : 0, 'Passing Cmp' : 0, 'Passing Att' : 0, 'Passing Yds' : 0,
+                'Passing Int' : 0, 'Rushing Att' : 0, 'Rushing Yds' : 0, 'Rushing TD' : 0, 'Receiving Rec' : 0, 
+                'Receiving Yds' : 0, 'Receiving TD' : 0})
     except KeyError:
-        print('Error cleaning college info for ' + str(int(df['YEAR'][0])) + ' draft, possibly due to draft not having happened yet')
+        print('Error cleaning draft info for ' + str(int(df['YEAR'][0])) + ', possibly due to draft not having happened yet')
         pass
-    df = df.fillna({'Solo' : 0, 'Int' : 0, 'Sk' : 0, 'Passing Cmp' : 0, 'Passing Att' : 0, 'Passing Yds' : 0,
-                    'Passing Int' : 0, 'Rushing Att' : 0, 'Rushing Yds' : 0, 'Rushing TD' : 0, 'Receiving Rec' : 0, 
-                    'Receiving Yds' : 0, 'Receiving TD' : 0})
     return df
 
 
@@ -136,16 +137,17 @@ def combine_and_clean_all_drafts():
     return df
 
 
-def get_current_executives_and_clean(df_passed):
-    df = df_passed.copy()
+def get_current_executives_and_clean():
+    #Read in the raw executives data
+    df = pd.read_csv(TOP_PATH + '/data/raw/EXECUTIVES.csv')
     #Get a list of all the current GMs
-    curr_executives = df[df['To'] == MOST_RECENT_DRAFT]['Person'].values
+    curr_executives = df[df['To'] == MOST_RECENT_DRAFT - 1]['Person'].values
     #Get a boolean list to find dataframe of current GMs, including where they've worked before
     executive_choices = df.apply(lambda x : x['Person'] in curr_executives, axis = 1)
     curr_executives_df = df[executive_choices]
     curr_executives_df = curr_executives_df.reset_index(drop = True)
     #Add in a feature that has list of years worked for each GM that will help with joining later
-    curr_executives_df['Years Worked'] = curr_executives_df.apply(lambda x : list(range(x['From'], x['To'] + 1)), axis = 1)
+    curr_executives_df['Years Worked'] = curr_executives_df.apply(lambda x : list(range(x['From'], x['To'] + 2)), axis = 1) #Might need to change this back to a +1 at some point
     #If the directory to put it in (data/interim) doesn't exist, make it
     if not os.path.exists(TOP_PATH + '/data/interim'):
         os.mkdir(TOP_PATH + '/data/interim')
@@ -154,7 +156,9 @@ def get_current_executives_and_clean(df_passed):
     return curr_executives_df
 
 
-def combine_drafts_and_executives(full_draft_df, curr_execs_df):
+def combine_drafts_and_executives():
+    full_draft_df = combine_and_clean_all_drafts()
+    curr_execs_df = get_current_executives_and_clean()
     #Merge the full draft dataframe with the current executives dataframe based on team
     #This will result in a very large dataframe as each player will have a row for each GM of the team
     #they were drafted by
@@ -168,6 +172,12 @@ def combine_drafts_and_executives(full_draft_df, curr_execs_df):
     df.rename({'To_x' : 'Played To'}, axis = 1, inplace = True)
     if not os.path.exists(TOP_PATH + '/data/final'):
         os.mkdir(TOP_PATH + '/data/final')
+    df = df[['GM', 'YEAR', 'Rnd', 'Pick', 'Tm', 'Player', 'Pos', 'Age', 'Played To', 
+            'AP1', 'PB', 'St', 'G', 'Passing Cmp', 'Passing Att', 'Passing Yds', 'Passing TD',
+            'Passing Int', 'Rushing Att', 'Rushing Yds', 'Rushing TD', 'Rec',
+            'Receiving Yds', 'Receiving TD', 'Solo', 'Int', 'Sk', 'College/Univ',
+            'Ht', 'Wt', '40yd', 'Vertical', 'Bench', 'Broad Jump', '3Cone',
+            'Shuttle']].reset_index(drop = True)
     df.to_csv(TOP_PATH + '/data/final/EXECUTIVES_PICKS.csv', index = False)
     return df
 
