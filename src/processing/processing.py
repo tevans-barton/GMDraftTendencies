@@ -39,7 +39,7 @@ def clean_draft(df_passed):
     try:
         df['College/Univ'] = df['College/Univ'].apply(lambda x: x.replace('St.', 'State') if isinstance(x, str) else x)
         df['College/Univ'] = df['College/Univ'].apply(lambda x: college_map[x] if x in college_map.keys() else x)
-        df['Pos'] = df['Pos'].replace({'DL' : 'DE', 'T' : 'OT'})
+        df['Pos'] = df['Pos'].replace({'DL' : 'DE', 'T' : 'OT', 'NT' : 'DT'})
         df = df.fillna({'Solo' : 0, 'Int' : 0, 'Sk' : 0, 'Passing Cmp' : 0, 'Passing Att' : 0, 'Passing Yds' : 0,
                 'Passing Int' : 0, 'Rushing Att' : 0, 'Rushing Yds' : 0, 'Rushing TD' : 0, 'Receiving Rec' : 0, 
                 'Receiving Yds' : 0, 'Receiving TD' : 0})
@@ -128,12 +128,12 @@ def combine_and_clean_all_drafts():
             #-16 and -14 are to get the two files that couldn't merge, as opposed to full file paths
             print('Problem Merging ' + str(combine_paths[i][-16:]) + ' and ' + str(draft_paths[i][-14:]) + ' possibly due to lack of draft information')
             pass
-    #If the directory to put it in (data/interim) doesn't exist, make it
+    #If the directory to put it in (data/final) doesn't exist, make it
     df = df.reset_index(drop = True)
-    if not os.path.exists(TOP_PATH + '/data/interim'):
-        os.mkdir(TOP_PATH + '/data/interim')
+    if not os.path.exists(TOP_PATH + '/data/final'):
+        os.mkdir(TOP_PATH + '/data/final')
     #Create the CSV file from this dataframe
-    df.to_csv(TOP_PATH + '/data/interim/ALL_DRAFTS_WITH_ATH_TESTING.csv', index = False)
+    df.to_csv(TOP_PATH + '/data/final/ALL_DRAFTS_WITH_ATH_TESTING.csv', index = False)
     return df
 
 
